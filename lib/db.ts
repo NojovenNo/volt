@@ -5,7 +5,7 @@ let initializedDb: NeonQueryFunction<false, false> | null = null;
 
 function initDb(): NeonQueryFunction<false, false> {
   if (initializedDb) return initializedDb;
-  initializedDb = neon(process.env.STORAGE_DATABASE_URL as string);
+  initializedDb = neon(process.env.DATABASE_URL as string);
   return initializedDb;
 }
 
