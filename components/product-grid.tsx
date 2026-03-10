@@ -46,6 +46,7 @@ export function ProductGrid({ products }: Props) {
       router.push('/' + '?' + params.toString(), { scroll: false });
     } else {
       params.set('category', category);
+      params.delete('page');
       router.push('/' + '?' + params.toString(), { scroll: false });
     }
   };
