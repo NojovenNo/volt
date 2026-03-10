@@ -20,7 +20,7 @@ export default function LoginPage() {
       // TODO: Replace with real login API call
       console.log("Log in user with email/password", { email, password })
       alert("Login submitted. Wire this up to your auth backend.")
-      router.push('/account')
+      router.push('account')
     } finally {
       setIsSubmitting(false)
     }
