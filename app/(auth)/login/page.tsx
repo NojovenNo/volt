@@ -5,12 +5,14 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useRouter, usePathname } from "next/navigation"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
-
+  const router = useRouter();
+  const pathname = usePathname();
   async function handleLogin(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setIsSubmitting(true)
@@ -18,6 +20,7 @@ export default function LoginPage() {
       // TODO: Replace with real login API call
       console.log("Log in user with email/password", { email, password })
       alert("Login submitted. Wire this up to your auth backend.")
+      router.push('/account')
     } finally {
       setIsSubmitting(false)
     }

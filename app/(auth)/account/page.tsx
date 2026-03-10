@@ -1,7 +1,7 @@
 'use client';
 
 import { FormEvent, useState } from "react";
-
+import Link from "next/link"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -192,7 +192,7 @@ export default function AccountPage() {
           {addresses.length > 0 && (
             <div className="mt-6 space-y-3">
               <h3 className="text-sm font-medium text-muted-foreground">
-              Your addresses
+                Your addresses
               </h3>
               <ul className="space-y-2 text-sm">
                 {addresses.map((addr) => (
@@ -215,7 +215,7 @@ export default function AccountPage() {
                         size="sm"
                         onClick={() => handleRemoveAddress(addr.id)}
                       >
-                      Remove
+                        Remove
                       </Button>
                     </div>
                   </li>
@@ -339,6 +339,15 @@ export default function AccountPage() {
           </div>
         </div>
       </section>
+      <div>
+        <Link href={'/'}>
+          <Button
+            type="submit"
+            className="mt-5 w-full">
+            Home
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 }
