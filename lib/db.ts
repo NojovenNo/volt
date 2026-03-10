@@ -5,7 +5,19 @@ let initializedDb: NeonQueryFunction<false, false> | null = null;
 
 function initDb(): NeonQueryFunction<false, false> {
   if (initializedDb) return initializedDb;
-  initializedDb = neon(process.env.DATABASE_URL as string);
+  console.info('ABOUT TO INIT DB');
+  console.info('-------------------------------------------');
+  console.info('process.env.DATABASE_URL', process.env.DATABASE_URL);
+
+  try {
+    initializedDb = neon(process.env.DATABASE_URL as string);
+  } catch (err) {
+    console.info('THIS IS THE ERROR');
+    console.info('-------------------------------------------');
+    console.error(err);
+  }
+
+  // @ts-ignore
   return initializedDb;
 }
 
