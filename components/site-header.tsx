@@ -98,16 +98,15 @@ export function SiteHeader({ featuredProducts }: Props) {
 
       {dropOpen && activeMenu === `store` && (
         <>
-          {/* Overlay que solo nubla el contenido debajo del dropdown, no el header ni el panel */}
           <div
-            className='fixed inset-x-0 top-32 bottom-0 z-30 bg-background/40 backdrop-blur-sm'
-            onMouseEnter={() => {
+            className='fixed inset-0 top-16 z-30 bg-background/60 backdrop-blur-md'
+            onClick={() => {
               setdropOpen(false);
               setActiveMenu(null);
             }}
           />
           <div
-            className='hidden border-b border-border/40 bg-background/95 px-8 py-6 shadow-lg backdrop-blur-lg md:block z-40 relative'
+            className='absolute left-0 right-0 top-16 z-40 border-b border-border/40 bg-background/95 px-8 py-6 shadow-xl backdrop-blur-lg'
             onMouseLeave={() => {
               setdropOpen(false);
               setActiveMenu(null);
