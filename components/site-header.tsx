@@ -24,6 +24,8 @@ interface Props {
 export function SiteHeader({ featuredProducts }: Props) {
   const { count } = useCart();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [dropOpen, setdropOpen] = useState(false);
+  const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
   const getFeaturedByCategory = (category: string): Product[] => {
     return featuredProducts.filter(p => p.category === category && p.featured);
@@ -43,8 +45,15 @@ export function SiteHeader({ featuredProducts }: Props) {
                 href={link.href}
                 className='text-sm text-muted-foreground transition-colors hover:text-foreground'
                 onMouseEnter={() => {
-                  const products = getFeaturedByCategory(link.label);
-                  console.log(products);
+                  // const products = getFeaturedByCategory(link.label);
+                  // console.log(products);
+                  if (link.label === 'Store') {
+                    setActiveMenu('store');
+                    setdropOpen(true);
+                  } else {
+                    setActiveMenu(null);
+                    setdropOpen(false);
+                  }
                 }}>
                 {link.label}
               </Link>
@@ -86,6 +95,75 @@ export function SiteHeader({ featuredProducts }: Props) {
           </Button>
         </div>
       </div>
+
+      {dropOpen && activeMenu === `store` && (
+        <>
+          {/* Overlay que solo nubla el contenido debajo del dropdown, no el header ni el panel */}
+          <div
+            className='fixed inset-x-0 top-32 bottom-0 z-30 bg-background/40 backdrop-blur-sm'
+            onMouseEnter={() => {
+              setdropOpen(false);
+              setActiveMenu(null);
+            }}
+          />
+          <div
+            className='hidden border-b border-border/40 bg-background/95 px-8 py-6 shadow-lg backdrop-blur-lg md:block z-40 relative'
+            onMouseLeave={() => {
+              setdropOpen(false);
+              setActiveMenu(null);
+            }}
+          >
+            <div className='mx-auto grid max-w-7xl grid-cols-4 gap-8 text-sm'>
+              <div>
+                <div className='mb-2 text-xs font-semibold uppercase text-muted-foreground'>
+                  Sort
+                </div>
+                <ul className='space-y-1 text-foreground/80'>
+                  <li>New</li>
+                  <li>Popular</li>
+                  <li>More listening</li>
+                  <li>More reviews</li>
+                </ul>
+              </div>
+              <div>
+                <div className='mb-2 text-xs font-semibold uppercase text-muted-foreground'>
+                  By age
+                </div>
+                <ul className='space-y-1 text-foreground/80'>
+                  <li>2 to 5</li>
+                  <li>5 to 9</li>
+                  <li>9 to 13</li>
+                  <li>13 to 15</li>
+                </ul>
+              </div>
+              <div>
+                <div className='mb-2 text-xs font-semibold uppercase text-muted-foreground'>
+                  Special ones
+                </div>
+                <ul className='space-y-1 text-foreground/80'>
+                  <li>Dyslexia</li>
+                  <li>Dysgraphia</li>
+                  <li>Dyscalculia</li>
+                  <li>Autism</li>
+                </ul>
+              </div>
+              <div>
+                <div className='mb-2 text-xs font-semibold uppercase text-muted-foreground'>
+                  Categories
+                </div>
+                <ul className='space-y-1 text-foreground/80'>
+                  <li>Kids&apos; Best Sellers</li>
+                  <li>Podcasts for your kids</li>
+                  <li>Coming Soon</li>
+                  <li>Sleep</li>
+                  <li>Bestsellers</li>
+                  <li>Editors&apos; Picks</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       {mobileOpen && (
         <nav className='border-t border-border/40 bg-background px-4 py-4 md:hidden'>
