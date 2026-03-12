@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Product } from '@/lib/products';
 
 const navLinks = [
-  { label: 'Home', href: '/' },
+  { label: 'Store', href: '/' },
   { label: 'Components', href: '/?category=Components' },
   { label: 'Phones', href: '/?category=Phones' },
   { label: 'Gaming', href: '/?category=Gaming' },
