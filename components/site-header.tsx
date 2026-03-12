@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useCart } from '@/lib/cart-store';
 import { Badge } from '@/components/ui/badge';
+import { Product } from '@/lib/products';
 
 const navLinks = [
   { label: 'Home', href: '/' },
@@ -16,9 +17,17 @@ const navLinks = [
   { label: 'Audio', href: '/?category=Audio' },
 ];
 
-export function SiteHeader() {
+interface Props {
+  featuredProducts: Product[];
+}
+
+export function SiteHeader({ featuredProducts }: Props) {
   const { count } = useCart();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const getFeaturedByCategory = (category: string): Product[] => {
+    return featuredProducts.filter(p => p.category === category && p.featured);
+  };
 
   return (
     <header className='sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-lg'>
@@ -33,7 +42,10 @@ export function SiteHeader() {
                 key={link.href}
                 href={link.href}
                 className='text-sm text-muted-foreground transition-colors hover:text-foreground'
-              >
+                onMouseEnter={() => {
+                  const products = getFeaturedByCategory(link.label);
+                  console.log(products);
+                }}>
                 {link.label}
               </Link>
             ))}
