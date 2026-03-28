@@ -21,3 +21,25 @@ export async function getFeaturedProducts() {
     await db`SELECT * FROM products WHERE featured IS TRUE`;
   return featuredProducts;
 }
+
+export async function saveUser({
+  email,
+  passwordHash,
+}: {
+  email: string;
+  passwordHash: string;
+}) {
+  const db = initDb();
+  const [user] = await db`
+    INSERT INTO users (email, password_hash)
+    VALUES (${email}, ${passwordHash})
+    RETURNING id, email, password_hash
+  `;
+  return user;
+}
+
+export async function getUserByEmail({ email }: { email: string }) {
+  const db = initDb();
+  const [user] = await db`SELECT * FROM users WHERE users.email = ${email}`;
+  return user;
+}
