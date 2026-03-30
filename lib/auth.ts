@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
 
-import { getUserByEmail, saveUser } from './db';
+import { getUserByEmail, getUserById, saveUser } from './db';
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
 
@@ -115,5 +115,40 @@ export async function isLoggedIn() {
   } catch {
     cookieStore.delete('session');
     return false;
+  }
+}
+
+export async function getCurrentUser() {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get('session');
+  const jwt = sessionCookie?.value;
+
+  if (!jwt) {
+    if (sessionCookie) {
+      cookieStore.delete('session');
+    }
+
+    return null;
+  }
+
+  try {
+    const payload = await verifyToken(jwt);
+
+    if (!payload.sub) {
+      cookieStore.delete('session');
+      return null;
+    }
+
+    const user = await getUserById({ id: payload.sub });
+
+    if (!user) {
+      cookieStore.delete('session');
+      return null;
+    }
+
+    return { id: user.id, email: user.email } as const;
+  } catch {
+    cookieStore.delete('session');
+    return null;
   }
 }

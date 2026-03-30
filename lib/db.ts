@@ -43,3 +43,10 @@ export async function getUserByEmail({ email }: { email: string }) {
   const [user] = await db`SELECT * FROM users WHERE users.email = ${email}`;
   return user;
 }
+
+export async function getUserById({ id }: { id: string }) {
+  const db = initDb();
+  const [user] =
+    await db`SELECT users.id, users.email FROM users WHERE users.id = ${id}`;
+  return user;
+}
