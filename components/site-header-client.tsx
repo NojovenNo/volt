@@ -79,7 +79,14 @@ export function SiteHeaderClient({ userEmail }: SiteHeaderClientProps) {
                 <div className='absolute right-0 top-11 z-50 w-56 rounded-md border border-border bg-popover p-3 shadow-md'>
                   <p className='mb-2 text-xs text-muted-foreground'>Logged in as</p>
                   <p className='truncate text-sm font-medium'>{userEmail}</p>
-                  <form action='/logout' method='post' className='mt-3'>
+                  <Link
+                    href='/profile'
+                    className='mt-3 block w-full rounded-md border border-border bg-background px-3 py-2 text-center text-sm font-medium transition-colors hover:bg-accent'
+                    onClick={() => setAccountOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                  <form action='/logout' method='post' className='mt-2'>
                     <Button type='submit' variant='outline' className='w-full'>
                       Logout
                     </Button>
@@ -139,7 +146,14 @@ export function SiteHeaderClient({ userEmail }: SiteHeaderClientProps) {
               <div className='mt-2 rounded-md border border-border p-3'>
                 <p className='text-xs text-muted-foreground'>Logged in as</p>
                 <p className='truncate text-sm font-medium'>{userEmail}</p>
-                <form action='/logout' method='post' className='mt-3'>
+                <Link
+                  href='/profile'
+                  className='mt-3 block w-full rounded-md border border-border bg-background px-3 py-2 text-center text-sm font-medium transition-colors hover:bg-accent'
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Profile
+                </Link>
+                <form action='/logout' method='post' className='mt-2'>
                   <Button type='submit' variant='outline' className='w-full'>
                     Logout
                   </Button>

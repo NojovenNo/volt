@@ -50,3 +50,21 @@ export async function getUserById({ id }: { id: string }) {
     await db`SELECT users.id, users.email FROM users WHERE users.id = ${id}`;
   return user;
 }
+
+export async function getUserPasswordHashById({ id }: { id: string }) {
+  const db = initDb();
+  const [user] =
+    await db`SELECT password_hash FROM users WHERE users.id = ${id}`;
+  return user as { password_hash: string } | undefined;
+}
+
+export async function updateUserPasswordHash({
+  id,
+  passwordHash,
+}: {
+  id: string;
+  passwordHash: string;
+}) {
+  const db = initDb();
+  await db`UPDATE users SET password_hash = ${passwordHash} WHERE id = ${id}`;
+}

@@ -99,12 +99,19 @@ export default function AccountPage() {
 
     setIsSavingPassword(true);
     try {
-      // TODO: Replace with secure API call to change password for the authenticated user
-      console.log("Change password", {
-        currentPassword,
-        newPassword,
+      const response = await fetch("/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword }),
       });
-      alert("Password change submitted. Wire this up to your backend.");
+      const data = (await response.json().catch(() => ({}))) as {
+        error?: string;
+      };
+      if (!response.ok) {
+        alert(data.error ?? "Could not update password.");
+        return;
+      }
+      alert("Password updated.");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmNewPassword("");
