@@ -161,6 +161,33 @@ export async function getCurrentUser() {
 
 const MIN_PASSWORD_LENGTH = 8;
 
+function validateChangePasswordInputs({
+  currentPassword,
+  newPassword,
+  passwordMatch,
+}: {
+  currentPassword: string;
+  newPassword: string;
+  passwordMatch: boolean;
+}) {
+  let err;
+
+  if (!currentPassword || !newPassword) {
+    err = new Error('Current password and new password are required');
+    err.name = '400';
+  } else if (newPassword.length < MIN_PASSWORD_LENGTH) {
+    err = new Error(
+      `Password must be at least ${MIN_PASSWORD_LENGTH} characters`,
+    );
+    err.name = '400';
+  } else if (!passwordMatch) {
+    err = new Error('Current password is incorrect');
+    err.name = '401';
+  }
+
+  throw err;
+}
+
 export async function changePassword(request: Request) {
   const body = await request.json();
   const currentPassword =
@@ -168,43 +195,25 @@ export async function changePassword(request: Request) {
   const newPassword =
     typeof body.newPassword === 'string' ? body.newPassword : '';
 
-  if (!currentPassword || !newPassword) {
-    const err = new Error('Current password and new password are required');
-    err.name = '400';
-    throw err;
-  }
-
-  if (newPassword.length < MIN_PASSWORD_LENGTH) {
-    const err = new Error(
-      `Password must be at least ${MIN_PASSWORD_LENGTH} characters`,
-    );
-    err.name = '400';
-    throw err;
-  }
-
   const sessionUser = await getCurrentUser();
-  if (!sessionUser) {
-    const err = new Error('Unauthorized');
-    err.name = '401';
-    throw err;
-  }
+  const row = await getUserPasswordHashById({ id: sessionUser?.id });
 
-  const row = await getUserPasswordHashById({ id: sessionUser.id });
-  if (!row) {
-    const err = new Error('Unauthorized');
-    err.name = '401';
-    throw err;
+  if (!row?.password_hash || typeof row.password_hash !== 'string') {
+    throw new Error('Something went wrong');
+  }
+  if (!sessionUser) {
+    throw new Error('Something went wrong');
   }
 
   const passwordMatch = await verifyPassword(
     currentPassword,
-    row.password_hash,
+    row?.password_hash,
   );
-  if (!passwordMatch) {
-    const err = new Error('Current password is incorrect');
-    err.name = '401';
-    throw err;
-  }
+  validateChangePasswordInputs({
+    currentPassword,
+    newPassword,
+    passwordMatch,
+  });
 
   const passwordHash = await hashPassword(newPassword);
   await updateUserPasswordHash({
