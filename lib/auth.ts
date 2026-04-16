@@ -2,7 +2,13 @@ import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
 
-import { getUserByEmail, saveUser } from './db';
+import {
+  getUserByEmail,
+  getUserById,
+  getUserPasswordHashById,
+  saveUser,
+  updateUserPasswordHash,
+} from './db';
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
 
@@ -116,4 +122,102 @@ export async function isLoggedIn() {
     cookieStore.delete('session');
     return false;
   }
+}
+
+export async function getCurrentUser() {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get('session');
+  const jwt = sessionCookie?.value;
+
+  if (!jwt) {
+    if (sessionCookie) {
+      cookieStore.delete('session');
+    }
+
+    return null;
+  }
+
+  try {
+    const payload = await verifyToken(jwt);
+
+    if (!payload.sub) {
+      cookieStore.delete('session');
+      return null;
+    }
+
+    const user = await getUserById({ id: payload.sub });
+
+    if (!user) {
+      cookieStore.delete('session');
+      return null;
+    }
+
+    return { id: user.id, email: user.email } as const;
+  } catch {
+    cookieStore.delete('session');
+    return null;
+  }
+}
+
+const MIN_PASSWORD_LENGTH = 8;
+
+function validateChangePasswordInputs({
+  currentPassword,
+  newPassword,
+  passwordMatch,
+}: {
+  currentPassword: string;
+  newPassword: string;
+  passwordMatch: boolean;
+}) {
+  let err;
+
+  if (!currentPassword || !newPassword) {
+    err = new Error('Current password and new password are required');
+    err.name = '400';
+  } else if (newPassword.length < MIN_PASSWORD_LENGTH) {
+    err = new Error(
+      `Password must be at least ${MIN_PASSWORD_LENGTH} characters`,
+    );
+    err.name = '400';
+  } else if (!passwordMatch) {
+    err = new Error('Current password is incorrect');
+    err.name = '401';
+  }
+
+  throw err;
+}
+
+export async function changePassword(request: Request) {
+  const body = await request.json();
+  const currentPassword =
+    typeof body.currentPassword === 'string' ? body.currentPassword : '';
+  const newPassword =
+    typeof body.newPassword === 'string' ? body.newPassword : '';
+
+  const sessionUser = await getCurrentUser();
+  const row = await getUserPasswordHashById({ id: sessionUser?.id });
+
+  if (!row?.password_hash || typeof row.password_hash !== 'string') {
+    throw new Error('Something went wrong');
+  }
+  if (!sessionUser) {
+    throw new Error('Something went wrong');
+  }
+
+  const passwordMatch = await verifyPassword(
+    currentPassword,
+    row?.password_hash,
+  );
+  validateChangePasswordInputs({
+    currentPassword,
+    newPassword,
+    passwordMatch,
+  });
+
+  const passwordHash = await hashPassword(newPassword);
+  await updateUserPasswordHash({
+    id: sessionUser.id,
+    passwordHash,
+  });
 }
